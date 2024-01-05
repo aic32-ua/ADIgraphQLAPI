@@ -1,6 +1,7 @@
-import graphql, { GraphQLSchema, GraphQLObjectType, GraphQLInt, GraphQLString, GraphQLList, GraphQLNullableType, GraphQLError} from 'graphql';
+import { GraphQLObjectType, GraphQLInt, GraphQLString, GraphQLList, GraphQLError} from 'graphql';
 import {UsuarioType} from './TypeDefs/UsuarioType';
-import {usuarios} from '../datos';
+import {AutorType} from './TypeDefs/AutorType';
+import {usuarios, autores, libros} from '../datos';
 
 var nextUsuarioId = usuarios.length + 1;
 
@@ -8,15 +9,14 @@ var nextUsuarioId = usuarios.length + 1;
 export const RootQuery = new GraphQLObjectType({
     name: 'RootQueryType',
     fields: {
-        todosUsuarios:{
-            type: new GraphQLList(UsuarioType),
-            args: {
-                id: {type: GraphQLInt},
-                nombre: {type: GraphQLString},
-                apellido: {type: GraphQLString}
-            },
+        autores:{
+            type: new GraphQLList(AutorType),
             resolve(parent, args){
-                return usuarios;
+                var result = Array.from(autores.values());
+                result.forEach(autor => {
+                    autor.libros = Array.from(libros.values()).filter(libro => libro.autorId === autor.id);
+                });
+                return result;
             }
         }
     }
