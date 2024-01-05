@@ -1,26 +1,34 @@
-import { GraphQLObjectType, GraphQLInt, GraphQLString, GraphQLList, GraphQLError} from 'graphql';
+import { GraphQLObjectType, GraphQLInt, GraphQLString, GraphQLList, GraphQLError, buildSchema} from 'graphql';
 import {UsuarioType} from './TypeDefs/UsuarioType';
 import {AutorType} from './TypeDefs/AutorType';
 import {usuarios, autores, libros} from '../datos';
 
 var nextUsuarioId = usuarios.length + 1;
 
-
 export const RootQuery = new GraphQLObjectType({
     name: 'RootQueryType',
     fields: {
         autores:{
             type: new GraphQLList(AutorType),
-            resolve(parent, args){
-                var result = Array.from(autores.values());
-                result.forEach(autor => {
-                    autor.libros = Array.from(libros.values()).filter(libro => libro.autorId === autor.id);
-                });
-                return result;
+            resolve(parent, args, context, info){
+                return Array.from(autores.values());
             }
-        }
+        },
+        autor:{
+            type: AutorType,
+            args: {
+                id: {type: GraphQLInt}
+            },
+            resolve(parent, args){
+                return autores.get(args.id);
+            }
+        },
     }
-})
+});
+
+
+
+
 export const Mutation = new GraphQLObjectType({
     name: 'Mutation',
     fields: {
