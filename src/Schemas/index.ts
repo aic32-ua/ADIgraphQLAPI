@@ -5,12 +5,21 @@ import {usuarios, autores, libros} from '../datos';
 
 var nextUsuarioId = usuarios.length + 1;
 
+//ejemplo autorizacion simplificado
+function authorized(context: any): boolean{
+    return context.req.headers['authorization'];
+}
+
 export const RootQuery = new GraphQLObjectType({
     name: 'RootQueryType',
     fields: {
         autores:{
             type: new GraphQLList(AutorType),
-            resolve(parent, args, context, info){
+            resolve(parent, args, context){
+                if(!authorized(context)){
+                    return null
+                }
+
                 return Array.from(autores.values());
             }
         },
