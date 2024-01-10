@@ -1,6 +1,6 @@
 import { GraphQLObjectType, GraphQLInt, GraphQLString, GraphQLScalarType, Kind, GraphQLList} from 'graphql';
 import { LibroType } from './LibroType';
-import { Libro } from '../../datos';
+import { Autor, Libro } from '../../datos';
 
 export const DateType = new GraphQLScalarType({
     name: 'Date',
@@ -28,7 +28,7 @@ export const DateType = new GraphQLScalarType({
 });
 
 
-export const AutorType = new GraphQLObjectType({
+export const AutorType: any = new GraphQLObjectType({
     name: 'Autor',
     fields: () => ({
         id: {type: GraphQLInt},
@@ -38,7 +38,7 @@ export const AutorType = new GraphQLObjectType({
         nacionalidad: {type: GraphQLString},
         libros: {
             type: new GraphQLList(LibroType),
-            resolve(parent, args, context, info){
+            resolve(parent: Libro, args, context, info){
                 const libros: Map<number, Libro> = context.libros;
                 return Array.from(libros.values()).filter(libro => libro.autorId === parent.id);
             }

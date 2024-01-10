@@ -2,6 +2,7 @@ import { GraphQLObjectType, GraphQLInt, GraphQLString, GraphQLList, GraphQLError
 import {UsuarioType} from './TypeDefs/UsuarioType';
 import {AutorType} from './TypeDefs/AutorType';
 import {usuarios, autores, libros} from '../datos';
+import { LibroType } from './TypeDefs/LibroType';
 
 var nextUsuarioId = usuarios.length + 1;
 
@@ -30,6 +31,21 @@ export const RootQuery = new GraphQLObjectType({
             },
             resolve(parent, args){
                 return autores.get(args.id);
+            }
+        },
+        libros:{
+            type: new GraphQLList(LibroType),
+            resolve(parent, args){
+                return Array.from(libros.values());
+            }
+        },
+        libro:{
+            type: LibroType,
+            args: {
+                id: {type: GraphQLInt}
+            },
+            resolve(parent, args){
+                return libros.get(args.id);
             }
         },
     }
