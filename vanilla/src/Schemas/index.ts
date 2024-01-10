@@ -1,10 +1,11 @@
 import { GraphQLObjectType, GraphQLInt, GraphQLString, GraphQLList, GraphQLError, buildSchema} from 'graphql';
 import {UsuarioType} from './TypeDefs/UsuarioType';
 import {AutorType} from './TypeDefs/AutorType';
-import {usuarios, autores, libros} from '../datos';
+import {usuarios, autores, libros, Libro} from '../datos';
 import { LibroType } from './TypeDefs/LibroType';
 
-var nextUsuarioId = usuarios.length + 1;
+var nextLibroId = libros.size + 1;
+var nextAutorId = autores.size + 1;
 
 //ejemplo autorizacion simplificado
 function authorized(context: any): boolean{
@@ -57,36 +58,87 @@ export const RootQuery = new GraphQLObjectType({
 export const Mutation = new GraphQLObjectType({
     name: 'Mutation',
     fields: {
-        crearUsuario:{
-            type: UsuarioType,
+        crearLibro: {
+            type: LibroType,
             args: {
-                nombre: {type: GraphQLString},
-                apellido: {type: GraphQLString},
-                email: {type: GraphQLString},
-                password: {type: GraphQLString}
+                titulo: {type: GraphQLString},
+                autor: {type: GraphQLInt}
             },
-            resolve(parent, args){
-                usuarios.push({id: nextUsuarioId, nombre: args.nombre, apellido: args.apellido, email: args.email, password: args.password});
-                
-                nextUsuarioId++;
+            resolve: (parent, args, context) => {
+                if(!authorized(context)){
+                    return null
+                }
 
-                return args;
+                const libro = new Libro();
+                libro.titulo = args.titulo;
+                libro.autorId = Number(args.autor);
+                libro.id = nextLibroId;
+                
+                libros.set(libro.id, libro);
+                nextLibroId++;
+
+                return libro;
             }
         },
-        borrarUsuario:{
-            type: UsuarioType,
+        borrarLibro: {
+            type: GraphQLString,
             args: {
                 id: {type: GraphQLInt}
             },
-            resolve(parent, args){
-                const deleteIndex = usuarios.findIndex(usuario => usuario.id === args.id);
-
-                if(deleteIndex === -1){
-                    throw new GraphQLError(`No existe el usuario con id ${args.id}`);
+            resolve: (parent, args, context) => {
+                if(!authorized(context)){
+                    return null
                 }
 
-                usuarios.splice(deleteIndex, 1);
-                return {};
+                if(libros.delete(args.id)){
+                    return "Libro borrado";
+                }
+
+                return null;
+            }
+        },
+        crearAutor: {
+            type: AutorType,
+            args: {
+                nombre: {type: GraphQLString},
+                apellido: {type: GraphQLString},
+                fechaNacimiento: {type: GraphQLString},
+                nacionalidad: {type: GraphQLString}
+            },
+            resolve: (parent, args, context) => {
+                if(!authorized(context)){
+                    return null
+                }
+
+                const autor = {
+                    nombre: args.nombre,
+                    apellido: args.apellido,
+                    fechaNacimiento: args.fechaNacimiento,
+                    nacionalidad: args.nacionalidad,
+                    id: nextAutorId
+                };
+
+                autores.set(autor.id, autor);
+                nextAutorId++;
+
+                return autor;
+            }
+        },
+        borrarAutor: {
+            type: GraphQLString,
+            args: {
+                id: {type: GraphQLInt}
+            },
+            resolve: (parent, args, context) => {
+                if(!authorized(context)){
+                    return null
+                }
+
+                if(autores.delete(args.id)){
+                    return "Autor borrado";
+                }
+
+                return null;
             }
         },
     }

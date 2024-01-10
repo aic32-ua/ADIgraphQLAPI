@@ -28,7 +28,7 @@ export const DateType = new GraphQLScalarType({
 });
 
 
-export const AutorType: any = new GraphQLObjectType({
+export const AutorType: GraphQLObjectType<Autor, any> = new GraphQLObjectType({
     name: 'Autor',
     fields: () => ({
         id: {type: GraphQLInt},

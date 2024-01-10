@@ -2,7 +2,7 @@ import { GraphQLInt, GraphQLObjectType, GraphQLString } from "graphql";
 import { AutorType } from "./AutorType";
 import { Libro, autores } from "../../datos";
 
-export const LibroType: any = new GraphQLObjectType({
+export const LibroType = new GraphQLObjectType({
     name: 'Libro',
     fields: () => ({
         id: {type: GraphQLInt},
