@@ -8,7 +8,6 @@ import { libros } from './datos';
 const app = express();
 const PORT = 3000;
 
-
 const schema = new GraphQLSchema({query: RootQuery, mutation: Mutation});
 
 app.use('/graphql', createHandler({

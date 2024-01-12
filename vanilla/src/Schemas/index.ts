@@ -7,21 +7,12 @@ import { LibroType } from './TypeDefs/LibroType';
 var nextLibroId = libros.size + 1;
 var nextAutorId = autores.size + 1;
 
-//ejemplo autorizacion simplificado
-function authorized(context: any): boolean{
-    return context.req.headers['authorization'];
-}
-
 export const RootQuery = new GraphQLObjectType({
     name: 'RootQueryType',
     fields: {
         autores:{
             type: new GraphQLList(AutorType),
             resolve(parent, args, context){
-                if(!authorized(context)){
-                    return null
-                }
-
                 return Array.from(autores.values());
             }
         },
@@ -65,10 +56,6 @@ export const Mutation = new GraphQLObjectType({
                 autor: {type: GraphQLInt}
             },
             resolve: (parent, args, context) => {
-                if(!authorized(context)){
-                    return null
-                }
-
                 const libro = new Libro();
                 libro.titulo = args.titulo;
                 libro.autorId = Number(args.autor);
@@ -86,10 +73,6 @@ export const Mutation = new GraphQLObjectType({
                 id: {type: GraphQLInt}
             },
             resolve: (parent, args, context) => {
-                if(!authorized(context)){
-                    return null
-                }
-
                 if(libros.delete(args.id)){
                     return "Libro borrado";
                 }
@@ -106,10 +89,6 @@ export const Mutation = new GraphQLObjectType({
                 nacionalidad: {type: GraphQLString}
             },
             resolve: (parent, args, context) => {
-                if(!authorized(context)){
-                    return null
-                }
-
                 const autor = {
                     nombre: args.nombre,
                     apellido: args.apellido,
@@ -130,10 +109,6 @@ export const Mutation = new GraphQLObjectType({
                 id: {type: GraphQLInt}
             },
             resolve: (parent, args, context) => {
-                if(!authorized(context)){
-                    return null
-                }
-
                 if(autores.delete(args.id)){
                     return "Autor borrado";
                 }
